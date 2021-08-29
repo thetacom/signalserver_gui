@@ -1,0 +1,311 @@
+{% macro message(message,title="", type="info", dismissable=True) -%}
+<div
+  class="alert alert-{{type}} {% if dismissable %}alert-dismissible{%endif%} fade show"
+  role="alert"
+>
+  {%if title %}
+  <h4 class="alert-heading">{{title}}</h4>
+  {%endif%} {{message}} {% if dismissable %}
+  <button
+    type="button"
+    class="btn-close"
+    data-bs-dismiss="alert"
+    aria-label="Close"
+  ></button>
+  {%endif%}
+</div>
+{%- endmacro %} {% macro input(name, value="", type='text', placeholder = "",
+default ="",units="", required=False) -%}
+<div class="form-floating input-group col-12">
+  <input
+    id="form-{{ name }}"
+    name="{{ name }}"
+    type="{{ type }}"
+    class="form-control"
+    {%
+    if
+    value
+    %}
+    value="{{value|e }}"
+    {%elif
+    default
+    %}
+    value="{{default|e }}"
+    {%endif%}
+    {%
+    if
+    placeholder
+    %}
+    placeholder="{{value|e }}"
+    {%endif%}
+    {%
+    if
+    required
+    %}
+    required
+    {%endif%}
+    aria-label="form-{{name}}-input"
+    aria-describedby="form-{{ name }}-input-units"
+  />
+  <span class="input-group-text" id="form-{{ name }}-input-units"
+    >{{ units }}</span
+  >
+  <label for="form-{{ name }}"
+    >{{" ".join((name|string).split("_")).title()}}</label
+  >
+</div>
+{%- endmacro %} {% macro checkbox(name, value=False, default = False,
+required=False) -%}
+<div class="form-check">
+  <input
+    id="form-checkbox-{{ name }}"
+    name="{{name}}"
+    class="form-check-input"
+    type="checkbox"
+    value="1"
+    {%
+    if
+    value
+    %}checked{%endif%}
+    {%
+    if
+    required
+    %}required{%endif%}
+  />
+  <label class="form-check-label" for="form-checkbox-{{ name }}">
+    {{ " ".join((name|string).split("_")).title() }}
+  </label>
+</div>
+{%- endmacro %} {%- macro textarea(name, value="", rows=10, cols=40,
+required=False) -%}
+<div class="form-floating col-12">
+  <textarea
+    name="{{ name }}"
+    rows="{{ rows }}"
+    cols="{{ cols }}"
+    class="form-control"
+    {%
+    if
+    required
+    %}
+    required
+    {%endif%}
+  >
+{{ value|e }}</textarea
+  >
+</div>
+{%- endmacro %} {% macro select(name, value="", options = [], default="",
+required=False) -%}
+<div class="form-floating col-12">
+  <select
+    id="form-{{name}}"
+    name="{{name}}"
+    class="form-select form-select-lg mb-3"
+    {%
+    if
+    required
+    %}
+    required
+    {%endif%}
+  >
+    {% for opt in options %} {%if value and opt == value %}
+    <option value="{{opt}}" selected>
+      {{" ".join((opt|string).split("_")).title()}}
+    </option>
+    {%elif not value and opt == default %}
+    <option value="{{opt}}" selected>
+      {{" ".join((opt|string).split("_")).title()}}
+    </option>
+    {%else%}
+    <option value="{{opt}}">
+      {{" ".join((opt|string).split("_")).title()}}
+    </option>
+    {%endif%} {% endfor %}
+  </select>
+  <label for="form-{{name}}" class="form-label"
+    >{{" ".join((name|string).split("_")).title()}}:</label
+  >
+</div>
+{%- endmacro %} {% macro select_tuple(name, value="", default="", options = [],
+required=False) -%}
+<div class="form-floating col-12">
+  <select
+    id="form-{{name}}"
+    name="{{name}}"
+    class="form-select form-select-lg mb-3"
+    {%
+    if
+    required
+    %}
+    required
+    {%endif%}
+  >
+    {% for opt in options %} {%if value and opt[0] == value %}
+    <option value="{{opt[0]}}" selected>
+      {{" ".join((opt[1]|string).split("_")).title()}}
+    </option>
+    {%elif not value and opt[0] == default %}
+    <option value="{{opt[0]}}" selected>
+      {{" ".join((opt[1]|string).split("_")).title()}}
+    </option>
+    {%else%}
+    <option value="{{opt[0]}}">
+      {{" ".join((opt[1]|string).split("_")).title()}}
+    </option>
+    {%endif%} {% endfor %}
+  </select>
+  <label for="form-{{name}}" class="form-label"
+    >{{" ".join((name|string).split("_")).title()}}</label
+  >
+</div>
+{%- endmacro %} {% macro select_item(name, items, value="", default="",
+required=False) -%}
+<div class="form-floating col-12">
+  <select
+    id="form-{{name}}"
+    name="{{name}}"
+    class="form-select form-select-lg mb-3"
+    {%
+    if
+    required
+    %}
+    required
+    {%endif%}
+  >
+    {% for item in items %} {% if not required %}
+    <option value="">None</option>
+    {%endif%} {%if value and item.id == value %}
+    <option value="{{item['id']}}" selected>
+      {{" ".join((item.name|string).split("_")).title()}}
+    </option>
+    {%elif not value and item['id'] == default %}
+    <option value="{{item.id}}" selected>
+      {{" ".join((item.name|string).split("_")).title()}}
+    </option>
+    {%else%}
+    <option value="{{item.id}}">
+      {{" ".join((item.name|string).split("_")).title()}}
+    </option>
+    {%endif%} {% endfor %}
+  </select>
+  <label for="form-{{name}}" class="form-label"
+    >{{" ".join((name|string).split("_")).title()}}</label
+  >
+</div>
+{%- endmacro %} {% macro file(name, value="", accept="", required=False)%}
+<div class="form-floating col-12">
+  <input
+    type="file"
+    class="form-control"
+    id="form-{{name}}"
+    name="{{name}}"
+    accept="{{accept}}"
+    value="{{value}}"
+    {%
+    if
+    required
+    %}
+    required
+    {%endif%}
+  />
+  <label for="form-{{name}}" class="form-label"
+    >File - Current: {{value}}</label
+  >
+</div>
+{%endmacro%} {% macro hint(name, hint)%}
+<div id="form-{{name}}-hint" class="form-text">{{hint}}</div>
+{%endmacro%} {% macro button(name, type='button', outline = False, href='',
+onclick='')%} {%if outline %} {% set styles = {"none":"","primary":
+"btn-outline-primary","secondary": "btn-outline-secondary","success":
+"btn-outline-success","danger": "btn-outline-danger","warning":
+"btn-outline-warning","info": "btn-outline-info","light":
+"btn-outline-light","dark": "btn-outline-dark","link": "btn-outline-link"}%}
+{%else%} {% set styles = {"primary": "btn-primary","secondary":
+"btn-secondary","success": "btn-success","danger": "btn-danger","warning":
+"btn-warning","info": "btn-info","light": "btn-light","dark": "btn-dark","link":
+"btn-link"}%} {%endif%} {%if type == 'submit'%}
+<button class="btn {{styles['success']}} my-2 my-sm-0" type="submit">
+  {{" ".join((name|string).split("_")).title()}}
+</button>
+{%elif type== 'reset'%}
+<button class="btn {{styles['warning']}} my-2 my-sm-0" type="reset">
+  {{" ".join((name|string).split("_")).title()}}
+</button>
+{%elif type== 'delete'%}
+<button class="btn {{styles['danger']}} my-2 my-sm-0" type="submit">
+  {{" ".join((name|string).split("_")).title()}}
+</button>
+{%elif href %}
+<a class="btn {{styles[type]}}" role="button" href="{{href}}"
+  >{{" ".join((name|string).split("_")).title()}}</a
+>
+{%else%}
+<button
+  type="button"
+  class="btn {{styles[type]}} my-2 my-sm-0"
+  onclick="{{onclick}}"
+>
+  {{" ".join((name|string).split("_")).title()}}
+</button>
+{%endif%} {%endmacro%} {% macro range(name, value=None, min=0, max=100,
+step=0.5, default = 0, units="", required=False)%}
+<div class="row">
+  <label for="form-{{name}}-range" class="form-label"
+    >{{" ".join((name|string).split("_")).title()}}</label
+  >
+  <input
+    id="form-{{name}}-range"
+    name="{{name}}"
+    type="range"
+    class="form-range col-9"
+    min="{{min}}"
+    max="{{max}}"
+    step="{{step}}"
+    {%if
+    value
+    != None
+    %}
+    value="{{value}}"
+    {%else%}
+    value="{{default}}"
+    {%endif%}
+    oninput="$('#form-{{ name }}-input')[0].value = this.value;"
+    {%
+    if
+    required
+    %}
+    required
+    {%endif%}
+  />
+  <div class="input-group col-3">
+    <input
+      id="form-{{ name }}-input"
+      type="text"
+      class="form-control"
+      {%
+      if
+      value
+      !="None"
+      %}
+      value="{{value|float }}"
+      {%elif
+      default
+      %}
+      value="{{default|float }}"
+      {%endif%}
+      {%
+      if
+      placeholder
+      %}
+      placeholder="{{value|e }}"
+      {%endif%}
+      aria-label="form-{{name}}-input"
+      aria-describedby="form-{{ name }}-input-units"
+      oninput="$('#form-{{ name }}-range')[0].value = this.value;"
+    />
+    <span class="input-group-text" id="form-{{ name }}-input-units"
+      >{{ units }}</span
+    >
+  </div>
+</div>
+{%endmacro%}

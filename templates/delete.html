@@ -1,0 +1,27 @@
+{% extends "base.html" %} {% block title %} Delete {{item.name.capitalize()}}{%
+endblock %} {% block head %} {{ super() }}
+<style type="text/css">
+  .important {
+    color: #336699;
+  }
+</style>
+{% endblock %}{% block page_header %}
+<h1>Delete - {{item.name.capitalize()}}</h1>
+{% endblock %}{% block content %}
+<form
+  class="row g-3"
+  method="post"
+  action="/{{type}}/{{item.id}}/delete"
+  name="delete-{{type}}-form"
+  novalidate
+  enctype="multipart/form-data"
+>
+  <h3>Are you sure you want to delete this item?</h3>
+  <div class="form-group col-12">
+    {{macros.button("Confirm", "delete", outline=True)}}
+    {{macros.button("cancel", "cancel", href="/" + type + "/" + item.id|string,
+    outline=False)}}
+  </div>
+</form>
+
+{%for i in request.query.forms %} {{i}} {%endfor%} {% endblock %}

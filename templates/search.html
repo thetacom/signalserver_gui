@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title_suffix %}{{title}}{% endblock %}
+{% block head %}
+{{ super() }}
+<style type="text/css">
+  .important {
+    color: #336699;
+  }
+</style>
+{% endblock %}
+{% block page_header %}Object Search{% endblock %}
+{% block content %}
+<ul class="nav nav-tabs" id="formTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="tab-one" data-bs-toggle="tab" data-bs-target="#one" type="button" role="tab" aria-controls="one" aria-selected="true">Search</button>
+  </li>
+</ul>
+<div class="tab-content" id="searchContent">
+  <div class="tab-pane fade show active" id="one" role="tabpanel" aria-labelledby="tab-one">
+    <form method='get' action='/search' name='theSource' /><!-- SignalServer/presenttwomysql.pl-->
+    <div class="form-group">
+      <label for="type">Type:</label>
+        <select id="type" name="type" class="form-control">
+          {% for each in ["stations", "antennas", "plots", "all"] %}
+            {% if each == search_type %}
+              <option value="{{each}}"selected="selected">{{each.capitalize()}}</option>
+            {% else %}
+              <option value="{{each}}">{{each.capitalize()}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+        <label for="form1-station">Query:</label>
+        <input type='text' class="form-control" name='q' id="form1-station" value="{{search}}">
+    </div>
+    <div class="form-group">
+        <button class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
+        <button class="btn btn-warning my-2 my-sm-0" type="reset">Reset</button>
+    </div>
+    </form>
+  </div>
+</div>
+{%if results %}
+<h2>Results:</h2>
+<table class="table table-striped">
+  <thead class="table-dark">
+  <tr>
+    <th scope="col">{% if sort_dir == "desc"%}<a href="/search?type={{search_type}}&q={{search}}&sort_by=id&sort_dir=asc">{%else%}<a href="/search?type={{search_type}}&q={{search}}&sort_by=id&sort_dir=desc">{%endif%}ID</a></th>
+    <th scope="col">{% if sort_dir == "desc"%}<a href="/search?type={{search_type}}&q={{search}}&sort_by=type&sort_dir=asc">{%else%}<a href="/search?type={{search_type}}&q={{search}}&sort_by=type&sort_dir=desc">{%endif%}Item Type</a></th>
+    <th scope="col">{% if sort_dir == "desc"%}<a href="/search?type={{search_type}}&q={{search}}&sort_by=name&sort_dir=asc">{%else%}<a href="/search?type={{search_type}}&q={{search}}&sort_by=name&sort_dir=desc">{%endif%}Name</a></th>
+  </tr>
+  </thead>
+  <tbody>
+    {% for item in results %}
+    <tr>
+      <th>{{ item.id|e }}</th>
+      <td>{{ item.type|e }}</td>
+      <td><a href='{{"/"+item.type+"/"+item.id|string+"/edit"}}'>{{ item.name|e }}</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif%}
+{% endblock %}

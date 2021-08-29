@@ -1,0 +1,102 @@
+{% extends "base.html" %} {% block title %}{{type.capitalize()}} -
+{{item.name}}{% endblock %} {% block head %} {{ super() }}
+<style type="text/css">
+  .important {
+    color: #336699;
+  }
+</style>
+{% endblock %} {% block page_header %}
+<h1>{{type.capitalize()}} - {{item.name}}</h1>
+{% endblock %} {% block content %}{{macros.button("Edit", "warning",
+href="/"+type+"/"+item.id|string+"/edit")}} {% if type ==
+"plot"%}{{macros.button("Files",
+"info",href="/"+type+"/"+item.id|string+"/files", outline=False)}}
+{{macros.button("Re-Generate", "primary",
+href="/"+type+"/"+item.id|string+"/generate")}}{% endif %}
+{{macros.button("Delete", "danger",
+href="/"+type+"/"+item.id|string+"/delete")}}
+<table class="table table-sm table-striped table-hover">
+  <thead class="table-dark">
+    <th scope="col" style="width: 50%">Parameter</th>
+    <th scope="col">Value</th>
+  </thead>
+  <tbody>
+    {% for col in item.__table__.columns %} {% if "_id" not in col.name %}
+    <tr>
+      <td>{{col.name|e}}</td>
+      <td>
+        {% if "use_" in col.name or "do_" in col.name %} {% if item[col.name] %}
+        <input type="checkbox" id="{{col.name}}" checked disabled />
+        {% else %}
+        <input type="checkbox" id="{{col.name}}" disabled />
+        {% endif %} {%else%} {{item[col.name]|e}} {%endif%}
+      </td>
+    </tr>
+    {% endif %} {% endfor %}
+  </tbody>
+</table>
+{% if type == "plot" %}
+<h2>Antenna:</h2>
+<table class="table table-sm table-striped table-hover">
+  <thead class="table-dark">
+    <th scope="col" style="width: 50%">Parameter</th>
+    <th scope="col">Value</th>
+  </thead>
+  <tbody>
+    {% for col in item.antenna.__table__.columns %}
+    <tr>
+      <td>{{col.name|e}}</td>
+      <td>
+        {%if col.name =="name"%}
+        <a href="/antenna/{{ item.antenna.id|e }}"
+          >{{item.antenna[col.name]|e}}</a
+        >
+        {%else%} {{item.antenna[col.name]|e}} {%endif%}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<h2>Station 1:</h2>
+<table class="table table-sm table-striped table-hover">
+  <thead class="table-dark">
+    <th scope="col" style="width: 50%">Parameter</th>
+    <th scope="col">Value</th>
+  </thead>
+  <tbody>
+    {% for col in item.station1.__table__.columns %}
+    <tr>
+      <td>{{col.name|e}}</td>
+      <td>
+        {%if col.name =="name"%}
+        <a href="/station/{{ item.station1.id|e }}"
+          >{{item.station1[col.name]|e}}</a
+        >
+        {%else%} {{item.station1[col.name]|e}} {%endif%}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<h2>Station 2:</h2>
+<table class="table table-sm table-striped table-hover">
+  <thead class="table-dark">
+    <th scope="col" style="width: 50%">Parameter</th>
+    <th scope="col">Value</th>
+  </thead>
+  <tbody>
+    {% for col in item.station1.__table__.columns %}
+    <tr>
+      <td>{{col.name|e}}</td>
+      <td>
+        {%if col.name =="name"%}
+        <a href="/station/{{ item.station2.id|e }}"
+          >{{item.station2[col.name]|e}}</a
+        >
+        {%else%} {{item.station2[col.name]|e}} {%endif%}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %} {% endblock %}

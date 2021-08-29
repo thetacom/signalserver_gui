@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% block title %}Config{% endblock %} {% block head %}
+{{ super() }}
+<style type="text/css">
+  .important {
+    color: #336699;
+  }
+</style>
+{% endblock %} {% block page_header %}{{title}}{% endblock %} {% block content
+%}
+<h2>Config.ini</h2>
+<ul>
+  {% for section in config.sections() %}
+  <li>
+    {{section}}
+    <ul>
+      {% for key in config[section].keys() %}
+      <li>{{key}}: {{config[section][key]}}</li>
+      {%endfor%}
+    </ul>
+  </li>
+  {%endfor%}
+</ul>
+<h2>Required Tools</h2>
+<ul>
+  {% for key in tools.keys() %}
+  <li>
+    {{key}}
+    <ul>
+      <li>Path: {{tools[key][0]}}</li>
+      <li>Present: {{tools[key][1]}}</li>
+    </ul>
+  </li>
+  {%endfor%}
+</ul>
+{% endblock %}

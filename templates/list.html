@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block title %}{{type.capitalize()}}{% endblock %}
+{% block head %} {{ super() }}
+<style type="text/css">
+  .important {
+    color: #336699;
+  }
+</style>
+{% endblock %}{% block page_header %} All {{type.capitalize()}}s {% endblock
+%}{% block content %}
+<table class="table table-striped table-sm">
+  <thead class="table-light">
+    <tr class="d-flex">
+      <th class="text-center col-1" scope="col">#</th>
+      <th class="col-3" scope="col">Name</th>
+      {% if type == "plot"%}
+      <th class="col-2" scope="col">Station1</th>
+      <th class="col-2" scope="col">Station2</th>
+      <th class="col-1" scope="col">Antenna</th>
+      {% endif %}
+      <th class="text-end col-4" scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr class="d-flex">
+      <th class="table-light text-center col-1">{{ item.id|e }}</th>
+      <td class="col-3">
+        <a href="/{{type}}/{{item.id}}">{{ item.name|e|truncate(20) }}</a>
+      </td>
+      {% if type == "plot"%}
+      <td class="col-2">{{ item.station1.name|e|truncate(15) }}</td>
+      <td class="col-2">{{ item.station2.name|e|truncate(15) }}</td>
+      <td class="col-1">{{ item.antenna.name|e|truncate(15) }}</td>
+      {% endif %}
+      <td class="text-end col-4">
+        {{macros.button("Edit", "warning",
+        href="/"+type+"/"+item.id|string+"/edit")}} {% if type ==
+        "plot"%}{{macros.button("Files",
+        "info",href="/"+type+"/"+item.id|string+"/files", outline=False)}}
+        {{macros.button("Re-Generate", "primary",
+        href="/"+type+"/"+item.id|string+"/generate")}}{% endif %}
+        {{macros.button("Delete", "danger",
+        href="/"+type+"/"+item.id|string+"/delete")}}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

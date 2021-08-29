@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}
+{%if action == "new"%}
+  {{action.capitalize()}} {{type.capitalize()}}
+{%else%}
+  {{action.capitalize()}} {{item.name.capitalize()}}
+{%endif%}
+{% endblock %} {% block head %} {{ super() }}
+<style type="text/css">
+  .important {
+    color: #336699;
+  }
+</style>
+{% endblock %}{% block page_header %}
+<h1>
+{%if action == "new"%}
+  {{action.capitalize()}} {{type.capitalize()}}
+{%else%}
+  {{action.capitalize()}} {{item.name.capitalize()}}
+{%endif%}</h1>
+{% endblock %}{% block content %}
+<div class="col-12">
+{%if action == "edit"%}
+    {{macros.button("View", "primary", href="/"+type+"/"+item.id|string)}}
+{%endif%}
+</div>
+<form
+  class="row g-3"
+  method="post"
+  {%if action == "new"%}
+  action="/{{type}}s/{{action}}"
+  {%else%}
+  action="/{{type}}/{{item.id}}/edit"
+  {%endif%}
+  name="{action}}-{{type}}-form"
+  novalidate
+  enctype="multipart/form-data"
+>
+
+  {% for col in table.columns %}
+    {% set value = item[col.name] if item else ""%}
+    {% if args[type][col.name]["form"]["type"] == "text"%}
+      {{macros.input(col.name, value, **args[type][col.name]["form"]["parameters"])}}
+    {%elif args[type][col.name]["form"]["type"] == "checkbox"%}
+      {{macros.checkbox(col.name, value, **args[type][col.name]["form"]["parameters"])}}
+    {%elif args[type][col.name]["form"]["type"] == "range"%}
+      {{macros.range(col.name, value, **args[type][col.name]["form"]["parameters"])}}
+    {%elif args[type][col.name]["form"]["type"] == "file"%}
+      {{macros.file(col.name, value, **args[type][col.name]["form"]["parameters"])}}
+    {%elif args[type][col.name]["form"]["type"] == "select"%}
+      {{macros.select(col.name, value, **args[type][col.name]["form"]["parameters"])}}
+    {%elif args[type][col.name]["form"]["type"] == "select_tuple"%}
+      {{macros.select_tuple(col.name, value, **args[type][col.name]["form"]["parameters"])}}
+    {%elif args[type][col.name]["form"]["type"] == "select_item"%}
+      {% if args[type][col.name]["form"]["select_type"] == "antenna"%}
+        {{macros.select_item(col.name, antennas, value, **args[type][col.name]["form"]["parameters"])}}
+      {% elif args[type][col.name]["form"]["select_type"] == "station"%}
+        {{macros.select_item(col.name, stations, value, **args[type][col.name]["form"]["parameters"])}}
+      {%endif%}
+    {%endif%}
+    {%if args[type][col.name]["form"]["type"] != "ignore"%}
+      {{macros.hint(col.name, args[type][col.name]["hint"])}}
+    {%endif%}
+  {% endfor %}
+  <div class="form-group col-12">
+  {%if action == "new"%}
+    {{macros.button("submit", "submit", outline=False)}}
+    {{macros.button("reset", "reset", outline=False)}}
+  {%else%}
+    {{macros.button("save", "submit", outline=False)}}
+  {%endif%}
+  </div>
+</form>
+
+
+{%for i in request.query.forms %}
+  {{i}}
+{%endfor%}
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %} {% block title %}{{item.name}} Files{% endblock %} {%
+block head %} {{ super() }}
+<style type="text/css">
+  .important {
+    color: #336699;
+  }
+</style>
+{% endblock %} {% block content %} {{macros.button("View",
+"primary",href="/plot/"+item.id|string)}} {{macros.button("Edit",
+"warning",href="/plot/"+item.id|string+"/edit")}} {{macros.button("Re-Generate",
+"primary", href="/plot/"+item.id|string+"/generate")}}
+
+<h1>{{item.name}} Files</h1>
+{% if files%}
+<ul class="nav nav-tabs" id="plotTab" role="tablist">
+  <li class="nav-item">
+    <a
+      class="nav-link active"
+      id="plot-tab"
+      data-bs-toggle="tab"
+      href="#plot"
+      role="tab"
+      aria-controls="plot"
+      aria-selected="true"
+      >Plot</a
+    >
+  </li>
+  {%if item.do_p2p_analysis %}
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      id="analysis-tab"
+      data-bs-toggle="tab"
+      href="#analysis"
+      role="tab"
+      aria-controls="analysis"
+      aria-selected="false"
+      >P2P Analysis</a
+    >
+  </li>
+  {%endif%}
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      id="files-tab"
+      data-bs-toggle="tab"
+      href="#files"
+      role="tab"
+      aria-controls="files"
+      aria-selected="false"
+      >Files</a
+    >
+  </li>
+</ul>
+<div class="tab-content" id="plotContent">
+  <div
+    class="tab-pane fade show active"
+    id="plot"
+    role="tabpanel"
+    aria-labelledby="plot-tab"
+  >
+    <figure class="figure">
+      <img
+        src="/download/{{item.id}}/{{item.name}}.{{image_type}}"
+        class="figure-img img-fluid rounded"
+        alt="A rendering of {{item.name}}"
+        style="
+          background-image: url('/img/light-gray-checker.png');
+          background-repeat: repeat;
+        "
+      />
+      <figcaption class="figure-caption">
+        {{item.name}}.{{image_type}}
+      </figcaption>
+    </figure>
+  </div>
+  {%if item.do_p2p_analysis %}
+  <div
+    class="tab-pane fade"
+    id="analysis"
+    role="tabpanel"
+    aria-labelledby="analysis-tab"
+  >
+    <figure class="figure">
+      <img
+        src="/download/{{item.id}}/{{item.name}}_ppa.{{image_type}}"
+        class="figure-img img-fluid rounded"
+        alt="A rendering of the point to point analysis of {{item.name}}"
+      />
+      <figcaption class="figure-caption">
+        {{item.name}}_ppa.{{image_type}}
+      </figcaption>
+    </figure>
+    {{ macros.button(name="Download Analysis Report", type="secondary",
+    href="/download/"+item.id|string+"/"+item.name+".txt")}}
+  </div>
+  {%endif%}
+  <div
+    class="tab-pane fade"
+    id="files"
+    role="tabpanel"
+    aria-labelledby="files-tab"
+  >
+    {% for key in files%} {% if files[key]|length > 0 %}
+    <h3>{{key}} {%if files[key]|length > 1 %}Files{%else%}File{%endif%}:</h3>
+    <ul>
+      {% for file in files[key] %}
+      <li>
+        <a href="/download/{{file[1]}}">{{file[0]}}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {%endif%} {%endfor%}
+  </div>
+</div>
+{%else%}
+<div>Generate plot first to access plot files.</div>
+<div>
+  {{macros.button("Generate", "primary",
+  href="/"+type+"/"+item.name+"/generate", outline=False)}}
+</div>
+{%endif%} {% endblock %}

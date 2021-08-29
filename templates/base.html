@@ -1,0 +1,29 @@
+{% import 'macros.html' as macros %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include 'head.html'%}
+  </head>
+  <body>
+  <body>
+    {% include 'navbar.html' %}
+
+    <main role="main" class="container">
+      {% if messages %}
+        {%for m in messages%}
+          {{macros.message(**m)}}
+        {%endfor%}
+      {%endif%}
+      <h1>{% block page_header %}{% endblock %}</h1>
+      <div class="container contents">
+        {% block content %}No content{% endblock %}
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">{% include 'footer.html'%}</span>
+      </div>
+    </footer>
+    {% include 'tail_includes.html' %}
+  </body>
+</html>

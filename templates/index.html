@@ -1,0 +1,121 @@
+{% extends "base.html" %} {% block title %}About{% endblock %} {% block head %}
+{{ super() }}
+<style type="text/css">
+  .important {
+    color: #336699;
+  }
+</style>
+{% endblock %} {% block page_header %}{{title}}{% endblock %} {% block content
+%}
+<div class="row my-3">
+  <h2>What is SignalServer?</h2>
+  'Splat!" is a simulation, originally created by John Magliacane (KD2BD), which
+  can be used to model or predict signal coverage. Given a set of parameters
+  which describe the transmitter, the intended receiver, and their respective
+  antenna characteristics, Signal Server creates a prediction that takes such
+  variables as terrain features, propagation characteristics, power levels,
+  receiver sensitivities, and other factors into account.
+</div>
+<div class="row my-3">
+  <h2>Signal Server GUI</h2>
+</div>
+<div class="row my-3">
+  Signal Server GUI is designed as a companion to Signal Server. Signal Server
+  GUI provides a simple and intuitive interface to manage the many configuration
+  options available within Signal Server. This web interface allows you to build
+  and save three item types (Stations, Antennas, and Plots). As you develop
+  plots you are afforded opportunity to manipulate some of the many parameters
+  which can affect propagation. Reasonable default values are provided, which
+  can be changed as you develop and refine your model.
+</div>
+<div class="card my-3">
+  <h5 class="card-header">Using Signal Server GUI</h5>
+  <div class="card-body">
+    <h5 class="card-title">Getting Started</h5>
+    <p class="card-text">
+      The process of generating a plot boils down to five main steps.
+    </p>
+  </div>
+  <h6 class="card-header text-muted">Steps:</h6>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Step 1 - Create antenna profiles</li>
+    <li class="list-group-item">Step 2 - Create stations</li>
+    <li class="list-group-item">Step 3 - Create plot</li>
+    <li class="list-group-item">Step 4 - Generate plot</li>
+    <li class="list-group-item">Step 5 - Download plot files</li>
+  </ul>
+  <div class="card-body">
+    <a href="/antennas/new" class="btn btn-primary">Start Here</a>
+  </div>
+</div>
+<div class="card my-3">
+  <h4 class="card-header">Plots</h4>
+  <div class="card-body">
+    <p class="card-text">
+      When generated, plots create a variety of files. Some of the possible
+      outputs are listed below.
+    </p>
+  </div>
+  <h5 class="card-header text-muted">Generated Files:</h5>
+  <h6 class="card-header text-muted">Basic plot output:</h6>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      .zip - A compressed zip file containing all generated files.
+    </li>
+    <li class="list-group-item">
+      .kmz - A Keyhole Markup Language Zip file ready for import into Google
+      Earth.
+    </li>
+    <li class="list-group-item">
+      .png - A Portable Network Graphic image file.
+    </li>
+    <li class="list-group-item">.ppm - A Portable Pixel Map image file.</li>
+  </ul>
+  <h6 class="card-header text-muted">
+    Additional file from point-to-point analysis:
+  </h6>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      _curvature - A compressed zip file containing all generated files.
+    </li>
+    <li class="list-group-item">_fresnel</li>
+    <li class="list-group-item">_fresnel60</li>
+    <li class="list-group-item">_profile</li>
+    <li class="list-group-item">_reference</li>
+    <li class="list-group-item">
+      .txt - A text based report of the point-to-point analysis.
+    </li>
+    <li class="list-group-item">
+      _ppa.png - A Portable Network Graphic image of the point-to-point
+      analysis.
+    </li>
+  </ul>
+</div>
+<div class="card my-3">
+  <h5 class="card-header">More Info</h5>
+  <div class="card-body">
+    <h5 class="card-title">YouTube</h5>
+    <p class="card-text">
+      Watch the TODO: How-To video by Aaron (cemaxecuter@protonmail.com) for a
+      Linux distribution featuring Signal Server GUI called 'DragonOS Focal', as
+      well as a collection of Software Defined Radio (SDR) programs. The Signal
+      Server GUI uses Linux, Python, Bottle Web Server, ImageMagick, gnuplot,
+      and SQLite.
+    </p>
+    <a href="#" class="btn btn-info">How-To</a>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Caveat</h5>
+    <p class="card-text">
+      SignalServer, like all simulation programs, is at best an approximation of
+      reality. A great many things can disturb the accuracy of the results. Even
+      an inaccurate simulation may be able to provide some guidance to a real
+      world situation, but there is no guarantee that the output is useful for
+      anything. Results provided by this website may or may not be applicable to
+      the 'real world', and should always be interpreted with a large measure of
+      skepticism.
+    </p>
+  </div>
+</div>
+
+{% endblock %}
