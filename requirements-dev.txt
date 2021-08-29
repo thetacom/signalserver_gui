@@ -1,0 +1,5 @@
+bandit >= 1.7.0
+black >= 21.7b0
+mypy >= 0.910
+pycodestyle >= 2.7.0
+setuptools >= 44.1.1

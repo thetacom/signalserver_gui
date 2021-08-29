@@ -1,0 +1,10 @@
+bottle >= 0.12.*
+bottle-sqlite >= 0.2.*
+bottle-sqlalchemy>=0.4.3
+Jinja2 >= 3.0.*
+kaleido>=0.2.*
+pandas>=1.3.*
+plotly>=5.2.*
+pyproj>=3.1.*
+simplekml>=1.3.*
+SQLAlchemy>=1.4.*
