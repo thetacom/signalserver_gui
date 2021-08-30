@@ -366,7 +366,7 @@ def action_item(item_type, action, db, id=0):
                     file_path = os.path.join(save_path, filename)
                     antenna_file.save(file_path, overwrite=True)
                     utils.convert_ant_file(file_path)
-                    request.forms["filename"] = filename
+                    request.forms["filename"] = request.forms.get("name")
                 # new_item = item_class(**request.forms)
                 params = {}
                 for col in item_class.__table__.columns:
