@@ -39,8 +39,8 @@ from signalserver_gui import model
 from signalserver_gui import utils
 from signalserver_gui.model import global_args, plot_args
 from signalserver_gui.antenna import Antenna
-from signalserver_gui.plot import Plot
 from signalserver_gui.station import Station
+from signalserver_gui.plot import Plot
 
 # from model import Base, Antenna, Station, Plot, _fk_pragma_on_connect
 

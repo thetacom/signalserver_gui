@@ -2,7 +2,9 @@
 import os
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
-from .antenna import Antenna, Base
+from .antenna import load_antennas
+
+from signalserver_gui import Base
 
 
 def _fk_pragma_on_connect(dbapi_con, con_record):
@@ -30,48 +32,6 @@ def init(db_path: str):
     engine = create_engine(f"sqlite:///{db_file}", echo=False)
     event.listen(engine, "connect", _fk_pragma_on_connect)
     return engine
-
-
-def load_antennas(db):
-    """Populate database with generic antennas."""
-    generic_antennas = [
-        {
-            "type": "antenna",
-            "columns": {
-                "name": "Generic Dipole",
-                "type": "dipole",
-                "filename": "dipole",
-            },
-        },
-        {
-            "type": "antenna",
-            "columns": {"name": "DB413-B", "type": "dipole", "filename": "DB413-B"},
-        },
-        {
-            "type": "antenna",
-            "columns": {"name": "Generic Yagi", "type": "yagi", "filename": "yagi"},
-        },
-        {
-            "type": "antenna",
-            "columns": {
-                "name": "Generic Cardio",
-                "type": "cardio",
-                "filename": "cardio",
-            },
-        },
-        {
-            "type": "antenna",
-            "columns": {
-                "name": "Generic Ellipse",
-                "type": "ellipse",
-                "filename": "ellipse",
-            },
-        },
-    ]
-    for item in generic_antennas:
-        new_row = Antenna(**item["columns"])
-        db.add(new_row)
-    db.commit()
 
 
 # Map all global parameters to their various attributes.

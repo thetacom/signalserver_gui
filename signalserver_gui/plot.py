@@ -10,9 +10,11 @@ from sqlalchemy import (
     Integer,
     String,
 )
-from sqlalchemy.orm import declarative_base, foreign, relationship
+from sqlalchemy.orm import foreign, relationship
+from .antenna import Antenna
+from .station import Station
 
-Base = declarative_base()
+from signalserver_gui import Base
 
 
 class Plot(Base):

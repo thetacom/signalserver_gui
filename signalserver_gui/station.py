@@ -7,9 +7,8 @@ from sqlalchemy import (
     Integer,
     String,
 )
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from sqlalchemy.orm import relationship
+from signalserver_gui import Base
 
 
 class Station(Base):
@@ -29,6 +28,8 @@ class Station(Base):
     downtilt_direction = Column(Float, default=0.0, nullable=False)
     created = Column(DateTime, default=datetime.now)
     last_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    # plots_as_station1 = relationship("Plot", backref="station1")
+    # plots_as_station2 = relationship("Plot", backref="station2")
 
     def __init__(
         self,
