@@ -452,7 +452,7 @@ plot_args = {
                 "type": "text",
                 "parameters": {
                     "placeholder": "20 - 100000",
-                    "units": "Hz",
+                    "units": "MHz",
                     "required": True,
                 },
             },
