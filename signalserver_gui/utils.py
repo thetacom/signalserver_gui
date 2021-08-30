@@ -311,9 +311,18 @@ def make_kmz(
     # Add map point for station1 to kml
     station1 = kml.newpoint(name=f"Station 1: {item.station1.name}")
     station1.description = description
-    station1.coords = [
-        (item.station1.longitude, item.station1.latitude, item.station1.height)
-    ]
+    if item.use_metric_units:
+        station1.coords = [
+            (item.station1.longitude, item.station1.latitude, item.station1.height)
+        ]
+    else:
+        station1.coords = [
+            (
+                item.station1.longitude,
+                item.station1.latitude,
+                item.station1.height / 3.28084,
+            )
+        ]
     station1.style = start_style
     station1.extrude = True
     station1.lookat.longitude = item.station1.longitude
@@ -337,7 +346,7 @@ def make_kmz(
     plot.latlonbox.south = dimensions[3]
     plot.latlonbox.west = dimensions[4]
 
-    if item.do_p2p_analysis:
+    if item.do_p2p_analysis and report:
         # Add additional components to kml for p2p analysis.
         geodesic = pyproj.Geod(ellps="WGS84")
         azimuth, back_azimuth, distance = geodesic.inv(
@@ -370,9 +379,18 @@ def make_kmz(
         # Add station2 to kml.
         station2 = kml.newpoint(name=f"Station 2: {item.station2.name}")
         station2.description = description
-        station2.coords = [
-            (item.station2.longitude, item.station2.latitude, item.station2.height)
-        ]
+        if item.use_metric_units:
+            station2.coords = [
+                (item.station2.longitude, item.station2.latitude, item.station1.height)
+            ]
+        else:
+            station2.coords = [
+                (
+                    item.station2.longitude,
+                    item.station2.latitude,
+                    item.station2.height / 3.28084,
+                )
+            ]
         station2.style = end_style
         station2.extrude = True
         station2.lookat.longitude = item.station2.longitude
@@ -384,7 +402,7 @@ def make_kmz(
         station2.lookat.heading = back_azimuth + 10
         station2.altitudemode = simplekml.AltitudeMode.relativetoground
         # Add segmented line if link is obstructed.
-        if report and report.link.obstructions:
+        if report.link.obstructions:
             clear_los_path = kml.newlinestring(name="Clear Line of Sight Path")
             clear_los_path.style = valid_line_style
             clear_los_path.description = description
@@ -394,12 +412,13 @@ def make_kmz(
                 (
                     report.transmitter.longitude,
                     report.transmitter.latitude,
-                    report.transmitter.elevation + report.transmitter.height,
+                    report.transmitter.metric_elevation
+                    + report.transmitter.metric_height,
                 ),
                 (
                     report.link.obstructions[-1].longitude,
                     report.link.obstructions[-1].latitude,
-                    report.link.obstructions[-1].height,
+                    report.link.obstructions[-1].metric_height,
                 ),
             ]
             obstructed_los_path = kml.newlinestring(
@@ -409,15 +428,21 @@ def make_kmz(
             obstructed_los_path.altitudemode = simplekml.AltitudeMode.absolute
             obstructed_los_path.extrude = True
             path_points = []
-            for obs in report.link.obstructions[::-1]:
-                path_points.append((obs.longitude, obs.latitude, obs.height))
             path_points.append(
                 (
                     report.receiver.longitude,
                     report.receiver.latitude,
-                    report.receiver.elevation + report.receiver.height,
+                    report.receiver.metric_elevation + report.receiver.metric_height,
                 ),
             )
+            for i, obs in enumerate(report.link.obstructions, 1):
+                path_points.append((obs.longitude, obs.latitude, obs.metric_height))
+                obs_point = kml.newpoint(name=f"Obstruction #{i}")
+                obs_point.style = end_style
+                obs_point.description = str(obs)
+                obs_point.altitudemode = simplekml.AltitudeMode.absolute
+                obs_point.coords = [(obs.longitude, obs.latitude, obs.metric_height)]
+
             obstructed_los_path.coords = path_points
         else:
             # Add single line path if link is unobstructed.
@@ -427,8 +452,16 @@ def make_kmz(
             los_path.altitudemode = simplekml.AltitudeMode.relativetoground
             los_path.extrude = True
             los_path.coords = [
-                (item.station1.longitude, item.station1.latitude, item.station1.height),
-                (item.station2.longitude, item.station2.latitude, item.station2.height),
+                (
+                    report.transmitter.longitude,
+                    report.transmitter.latitude,
+                    report.transmitter.metric_height,
+                ),
+                (
+                    report.receiver.longitude,
+                    report.receiver.latitude,
+                    report.receiver.metric_height,
+                ),
             ]
     kml.savekmz(f"{file_base}.kmz")
 

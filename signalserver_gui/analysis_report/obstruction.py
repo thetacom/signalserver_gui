@@ -17,23 +17,23 @@ class Obstruction:
         latitude: float,
         distance: float,
         height: float,
-        use_metric: bool = False,
+        metric: bool = False,
     ) -> None:
         """Initialize a new Obstruction instance."""
         self.longitude = longitude
         self.latitude = latitude
         self.distance = distance
         self.height = height
-        self.use_metric = use_metric
+        self.metric = metric
 
     @property
-    def use_metric(self) -> bool:
+    def metric(self) -> bool:
         """Getter/Setter for free_space_path_loss property."""
-        return self._use_metric
+        return self._metric
 
-    @use_metric.setter
-    def use_metric(self, new_value: bool = True) -> None:
-        self._use_metric = new_value
+    @metric.setter
+    def metric(self, new_value: bool = True) -> None:
+        self._metric = new_value
 
     @property
     def longitude(self) -> float:
@@ -71,9 +71,24 @@ class Obstruction:
     def height(self, new_value: float) -> None:
         self._height = new_value
 
+    @property
+    def metric_height(self) -> float:
+        """Getter/Setter for height property."""
+        if self.metric:
+            return self._height
+        else:
+            return self._height / 3.28084
+
+    @metric_height.setter
+    def metric_height(self, new_value: float) -> None:
+        if self.metric:
+            self._height = new_value
+        else:
+            self._height = new_value * 3.28084
+
     def with_units(self, value: float, abbr: bool = True, large: bool = False) -> str:
         """Convert a distance number to a string with units."""
-        type = "metric" if self.use_metric else "imperial"
+        type = "metric" if self.metric else "imperial"
         size = 1 if large else 0
         plurality = 2 if value >= 2 else 1
         if abbr:
@@ -88,6 +103,7 @@ class Obstruction:
 
         Obstruction instance factory method.
         """
+        print(f"New Obstruction: {descriptor}")
         try:
             # 51.5082 N,   0.5014 W, 20.27 miles, 118.11 feet AMSL
             metric = False if "mile" in descriptor else True

@@ -22,7 +22,7 @@ class Site:
         distance=0.0,
         azimuth=0.0,
         downtilt=0.0,
-        use_metric=False,
+        metric=False,
     ):
         """Initialize a new Site instance."""
         self.site = site
@@ -33,16 +33,16 @@ class Site:
         self.distance = distance
         self.azimuth = azimuth
         self.downtilt = downtilt
-        self.use_metric = use_metric
+        self.metric = metric
 
     @property
-    def use_metric(self) -> bool:
+    def metric(self) -> bool:
         """Getter/Setter for free_space_path_loss property."""
-        return self._use_metric
+        return self._metric
 
-    @use_metric.setter
-    def use_metric(self, new_value: bool = True) -> None:
-        self._use_metric = new_value
+    @metric.setter
+    def metric(self, new_value: bool = True) -> None:
+        self._metric = new_value
 
     @property
     def site(self) -> str:
@@ -81,6 +81,21 @@ class Site:
         self._elevation = new_value
 
     @property
+    def metric_elevation(self) -> float:
+        """Getter/Setter for metric elevation property."""
+        if self.metric:
+            return self._elevation
+        else:
+            return self._elevation / 3.28084
+
+    @metric_elevation.setter
+    def metric_elevation(self, new_value: float) -> None:
+        if self.metric:
+            self._elevation = new_value
+        else:
+            self._elevation = new_value * 3.28084
+
+    @property
     def height(self) -> float:
         """Getter/Setter for height property."""
         return self._height
@@ -88,6 +103,21 @@ class Site:
     @height.setter
     def height(self, new_value: float) -> None:
         self._height = new_value
+
+    @property
+    def metric_height(self) -> float:
+        """Getter/Setter for height property."""
+        if self.metric:
+            return self._height
+        else:
+            return self._height / 3.28084
+
+    @metric_height.setter
+    def metric_height(self, new_value: float) -> None:
+        if self.metric:
+            self._height = new_value
+        else:
+            self._height = new_value * 3.28084
 
     @property
     def distance(self) -> float:
@@ -118,7 +148,7 @@ class Site:
 
     def with_units(self, value: float, abbr: bool = True, large: bool = False) -> str:
         """Convert a distance number to a string with units."""
-        type = "metric" if self.use_metric else "imperial"
+        type = "metric" if self.metric else "imperial"
         size = 1 if large else 0
         plurality = 2 if value >= 2 else 1
         if abbr:
@@ -139,9 +169,9 @@ class Site:
             raise (Exception(f"{type} - Invalid Site type."))
         try:
             if "mile" in open(report_filename).read():
-                new_site.use_metric = False
+                new_site.metric = False
             else:
-                new_site.use_metric = True
+                new_site.metric = True
             in_target_section = False
             with open(report_filename) as report:
                 for line in report:
