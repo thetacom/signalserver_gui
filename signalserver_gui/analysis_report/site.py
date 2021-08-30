@@ -148,7 +148,7 @@ class Site:
                     if type == "tx":
                         if in_target_section:
                             if line.startswith("Site location:"):
-                                new_site.longitude, new_site.latitude = map(
+                                new_site.latitude, new_site.longitude = map(
                                     float, line.strip().split(": ")[1].split(", ")
                                 )
                             elif line.startswith("Ground elevation:"):
@@ -178,7 +178,7 @@ class Site:
                     else:
                         if in_target_section:
                             if line.startswith("Site location:"):
-                                new_site.longitude, new_site.latitude = map(
+                                new_site.latitude, new_site.longitude = map(
                                     float, line.strip().split(": ")[1].split(", ")
                                 )
                             elif line.startswith("Ground elevation:"):

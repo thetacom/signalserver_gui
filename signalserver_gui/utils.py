@@ -388,27 +388,35 @@ def make_kmz(
             clear_los_path = kml.newlinestring(name="Clear Line of Sight Path")
             clear_los_path.style = valid_line_style
             clear_los_path.description = description
-            clear_los_path.altitudemode = simplekml.AltitudeMode.relativetoground
+            clear_los_path.altitudemode = simplekml.AltitudeMode.absolute
             clear_los_path.extrude = True
             clear_los_path.coords = [
-                (item.station1.longitude, item.station1.latitude, item.station1.height),
                 (
-                    report.link.obstructions[0].longitude,
-                    report.link.obstructions[0].latitude,
-                    report.link.obstructions[0].height,
+                    report.transmitter.longitude,
+                    report.transmitter.latitude,
+                    report.transmitter.elevation + report.transmitter.height,
+                ),
+                (
+                    report.link.obstructions[-1].longitude,
+                    report.link.obstructions[-1].latitude,
+                    report.link.obstructions[-1].height,
                 ),
             ]
             obstructed_los_path = kml.newlinestring(
                 name="Obstructed Line of Sight Path"
             )
             obstructed_los_path.style = invalid_line_style
-            obstructed_los_path.altitudemode = simplekml.AltitudeMode.relativetoground
+            obstructed_los_path.altitudemode = simplekml.AltitudeMode.absolute
             obstructed_los_path.extrude = True
             path_points = []
-            for obs in report.link.obstructions:
+            for obs in report.link.obstructions[::-1]:
                 path_points.append((obs.longitude, obs.latitude, obs.height))
             path_points.append(
-                (item.station2.longitude, item.station2.latitude, item.station2.height),
+                (
+                    report.receiver.longitude,
+                    report.receiver.latitude,
+                    report.receiver.elevation + report.receiver.height,
+                ),
             )
             obstructed_los_path.coords = path_points
         else:
