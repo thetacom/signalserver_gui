@@ -1,4 +1,4 @@
-"""This module is a collection of utility functions for signal-server-gui."""
+"""This module is a collection of utility functions for signalserver_gui."""
 # TODO(Justin): Clean up unused imports.
 import base64
 import configparser
@@ -63,11 +63,11 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
         "normalize": False,
         "halve": 1,
         "nothreads": False,
-        "spatial_data_files": config["signal-server"]["elevation_data_dir"],
-        "lidar_data_dir": config["signal-server"]["lidar_data_dir"],
-        "user_data_files": config["signal-server"]["user_data_dir"],
-        "clutter_data_files": config["signal-server"]["clutter_data_dir"],
-        "color_profile": config["signal-server"]["color_profile"],
+        "spatial_data_files": config["signalserver"]["elevation_data_dir"],
+        "lidar_data_dir": config["signalserver"]["lidar_data_dir"],
+        "user_data_files": config["signalserver"]["user_data_dir"],
+        "clutter_data_files": config["signalserver"]["clutter_data_dir"],
+        "color_profile": config["signalserver"]["color_profile"],
     }
 
     # Build string of arguments for signalserver.
@@ -76,18 +76,18 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
     for key in global_args.keys():
         arg = global_args[key]
         if arg["type"] == bool:
-            if key in config["signal-server"]:
+            if key in config["signalserver"]:
                 value = (
-                    config["signal-server"].getboolean(key)
-                    if key in config["signal-server"]
+                    config["signalserver"].getboolean(key)
+                    if key in config["signalserver"]
                     else global_defaults[key]
                 )
                 if value:
                     command_args.append(arg["flag"])
         elif not arg["depends"] or any(getattr(item, i) for i in arg["depends"]):
-            if key in config["signal-server"]:
+            if key in config["signalserver"]:
                 command_args.append(arg["flag"])
-                command_args.append(str(config["signal-server"][key]))
+                command_args.append(str(config["signalserver"][key]))
 
     for key in plot_args["plot"].keys():
         arg = plot_args["plot"][key]
@@ -121,7 +121,7 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
             command_args.append(arg["flag"])
             command_args.append(
                 os.path.join(
-                    config["signal-server"]["antenna_profiles_dir"],
+                    config["signalserver"]["antenna_profiles_dir"],
                     item.antenna.type,
                     item.antenna.filename,
                 )
@@ -189,7 +189,7 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
                         command_args.append(arg["flag"])
                         command_args.append(str(getattr(station, key)))
 
-    item_path = os.path.join(config["signal-server-gui"]["output_dir"], str(item.id))
+    item_path = os.path.join(config["signalservergui"]["output_dir"], str(item.id))
     try:
         os.makedirs(item_path)
     except:
@@ -199,9 +199,9 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
 
     # Use 'signalserverHD' if resolution is set to 3600.
     if item.resolution == 3600:
-        command = config["signal-server"]["path"] + "HD"
+        command = config["signalserver"]["path"] + "HD"
     else:
-        command = config["signal-server"]["path"]
+        command = config["signalserver"]["path"]
     # Run signalserver command and capture output for use in kml.
     dimensions = run(command, command_args).split("|")
     run(

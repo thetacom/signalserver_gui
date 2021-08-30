@@ -41,16 +41,6 @@ from signalserver_gui.model import Antenna, Plot, Station, global_args, plot_arg
 
 # from model import Base, Antenna, Station, Plot, _fk_pragma_on_connect
 
-engine = model.init()
-plugin = sqlalchemy.Plugin(
-    engine,
-    model.Base.metadata,
-    keyword="db",
-    create=True,
-    commit=True,
-    use_kwargs=False,
-)
-install(plugin)
 template = functools.partial(jinja2_template, template_lookup=["templates"])
 config = configparser.ConfigParser()
 
@@ -474,13 +464,13 @@ def clean_generated_files():
 def get_config():
     """Render the config page."""
     tools = {
-        "signal-server": (
-            config["signal-server"]["path"],
-            True if utils.which(config["signal-server"]["path"]) else False,
+        "signalserver": (
+            config["signalserver"]["path"],
+            True if utils.which(config["signalserver"]["path"]) else False,
         ),
-        "signal-server": (
-            config["signal-server"]["path"],
-            True if utils.which(config["signal-server"]["path"] + "HD") else False,
+        "signalserver": (
+            config["signalserver"]["path"],
+            True if utils.which(config["signalserver"]["path"] + "HD") else False,
         ),
         "convert": (
             config["convert"]["path"],
@@ -501,62 +491,72 @@ if __name__ == "__main__":
         try:
             config.read("config.ini")
             # Check config for required sections and items
-            if "signal-server-gui" not in config:
-                raise (Exception("Missing 'signalserver-gui' section in config."))
-            elif "data_dir" not in config["signal-server-gui"]:
+            if "signalservergui" not in config:
+                raise (
+                    Exception("Missing required 'signalserver-gui' section in config.")
+                )
+            elif "data_dir" not in config["signalservergui"]:
                 raise (
                     Exception(
-                        "Missing 'data_dir' value in 'signal-server-gui' section of config."
+                        "Missing required 'data_dir' value in 'signalservergui' section of config."
                     )
                 )
-            elif "output_dir" not in config["signal-server-gui"]:
+            elif "output_dir" not in config["signalservergui"]:
                 raise (
                     Exception(
-                        "Missing 'output_dir' value in 'signal-server-gui' section of config."
+                        "Missing required 'output_dir' value in 'signalservergui' section of config."
                     )
                 )
-            elif "signal-server" not in config:
-                raise (Exception("Missing 'signal-server' section in config."))
-            elif "path" not in config["signal-server"]:
+            elif "database_dir" not in config["signalservergui"]:
                 raise (
                     Exception(
-                        "Missing 'path' value in 'signal-server' section of config."
+                        "Missing required 'database_dir' value in 'signalservergui' section of config."
+                    )
+                )
+            elif "signalserver" not in config:
+                raise (Exception("Missing required 'signalserver' section in config."))
+            elif "path" not in config["signalserver"]:
+                raise (
+                    Exception(
+                        "Missing required 'path' value in 'signalserver' section of config."
                     )
                 )
             elif "convert" not in config:
-                raise (Exception("Missing 'convert' section in config."))
+                raise (Exception("Missing required 'convert' section in config."))
             elif "path" not in config["convert"]:
                 raise (
-                    Exception("Missing 'path' value in 'convert' section of config.")
+                    Exception(
+                        "Missing required 'path' value in 'convert' section of config."
+                    )
                 )
 
-            if "antenna_profiles_dir" not in config["signal-server"]:
-                config["signal-server"]["antenna_profiles_dir"] = os.path.join(
-                    config["signal-server-gui"]["data_dir"], "antennas"
+            if "antenna_profiles_dir" not in config["signalserver"]:
+                config["signalserver"]["antenna_profiles_dir"] = os.path.join(
+                    config["signalservergui"]["data_dir"], "antennas"
                 )
-            if "elevation_data_dir" not in config["signal-server"]:
-                config["signal-server"]["elevation_data_dir"] = os.path.join(
-                    config["signal-server-gui"]["data_dir"], "elevation"
+            if "elevation_data_dir" not in config["signalserver"]:
+                config["signalserver"]["elevation_data_dir"] = os.path.join(
+                    config["signalservergui"]["data_dir"], "elevation"
                 )
-            if "lidar_data_dir" not in config["signal-server"]:
-                config["signal-server"]["lidar_data_dir"] = os.path.join(
-                    config["signal-server-gui"]["data_dir"], "lidar"
+            if "lidar_data_dir" not in config["signalserver"]:
+                config["signalserver"]["lidar_data_dir"] = os.path.join(
+                    config["signalservergui"]["data_dir"], "lidar"
                 )
-            if "user_data_dir" not in config["signal-server"]:
-                config["signal-server"]["user_data_dir"] = os.path.join(
-                    config["signal-server-gui"]["data_dir"], "user"
+            if "user_data_dir" not in config["signalserver"]:
+                config["signalserver"]["user_data_dir"] = os.path.join(
+                    config["signalservergui"]["data_dir"], "user"
                 )
-            if "clutter_data_dir" not in config["signal-server"]:
-                config["signal-server"]["clutter_data_dir"] = os.path.join(
-                    config["signal-server-gui"]["data_dir"], "clutter"
+            if "clutter_data_dir" not in config["signalserver"]:
+                config["signalserver"]["clutter_data_dir"] = os.path.join(
+                    config["signalservergui"]["data_dir"], "clutter"
                 )
-            if "color_profiles_dir" not in config["signal-server"]:
-                config["signal-server"]["color_profiles_dir"] = os.path.join(
-                    config["signal-server-gui"]["data_dir"], "color_profiles"
+            if "color_profiles_dir" not in config["signalserver"]:
+                config["signalserver"]["color_profiles_dir"] = os.path.join(
+                    config["signalservergui"]["data_dir"], "color_profiles"
                 )
-            if "color_profile" not in config["signal-server"]:
-                config["signal-server"]["color_profile"] = os.path.join(
-                    config["signal-server"]["color_profiles_dir"], "rainbow.dcf"
+            if "color_profile" not in config["signalserver"]:
+                config["signalserver"]["color_profile"] = os.path.join(
+                    config["signalserver"]["color_profiles_dir"], "rainbow.dcf"
                 )
         except Exception as e:
             print(
@@ -567,4 +567,14 @@ if __name__ == "__main__":
     else:
         print("No config.ini preset. Exiting...")
         exit()
+    engine = model.init(config["signalservergui"]["database_dir"])
+    plugin = sqlalchemy.Plugin(
+        engine,
+        model.Base.metadata,
+        keyword="db",
+        create=True,
+        commit=True,
+        use_kwargs=False,
+    )
+    install(plugin)
     run(host="localhost", port=8080, reloader=True, debug=True)

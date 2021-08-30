@@ -1,7 +1,7 @@
 """Module contains declarative class definitions for database."""
 # TODO(Justin): Clean up unused imports.
 from datetime import datetime
-
+import os
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
@@ -19,8 +19,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import declarative_base, foreign, mapper, relationship, sessionmaker
 
-db_file = "db/signalserver-gui.db"
-
 Base = declarative_base()
 
 
@@ -29,10 +27,10 @@ def _fk_pragma_on_connect(dbapi_con, con_record):
     dbapi_con.execute("pragma foreign_keys=ON")
 
 
-def init():
+def init(db_path: str):
     """Initialize the sqlite database engine."""
+    db_file = os.path.join(db_path, "signalserver_gui.db")
     engine = create_engine(f"sqlite:///{db_file}", echo=False)
-    # create_session = sessionmaker(bind=engine)
     event.listen(engine, "connect", _fk_pragma_on_connect)
     return engine
 
