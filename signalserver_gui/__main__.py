@@ -180,7 +180,9 @@ def plot_generate(id, db):
     item = q.first()
     if item:
         utils.generate(config, item)
-    redirect(f"/plot/{id}/files")
+        redirect(f"/plot/{id}/files")
+    else:
+        redirect(f"/")
 
 
 @get("/plot/<id:int>/files")
@@ -188,46 +190,49 @@ def plot_files(id, db):
     """Show available file for the current plot."""
     q = db.query(Plot).filter_by(id=id)
     item = q.first()
-    files = [
-        (
-            os.path.basename(file),
-            os.path.join(
-                os.path.basename(os.path.dirname(file)), os.path.basename(file)
-            ),
-        )
-        for file in glob.glob(f"downloads/{item.id}/*")
-    ]
-    grouped_files = {
-        "Analysis Report": [],
-        "KML": [],
-        "Zip": [],
-        "Image": [],
-        "Other": [],
-    }
-    for file in files:
-        if re.match(
-            r".+(\.txt|\.json|_curvature|_fresnel|_fresnel60|_profile|_reference)$",
-            file[0],
-        ):
-            grouped_files["Analysis Report"].append(file)
-        elif re.match(r".+\.(kml|kmz)$", file[0]):
-            grouped_files["KML"].append(file)
-        elif re.match(r".+\.(zip)$", file[0]):
-            grouped_files["Zip"].append(file)
-        elif re.match(r".+\.(png|jpg|bmp|ppm)$", file[0]):
-            grouped_files["Image"].append(file)
-        else:
-            grouped_files["Other"].append(file)
-    # print("File Count:", len(files))
-    if len(files) == 0:
-        redirect(f"/plot/{id}/generate")
-    parts = {
-        "type": "plot",
-        "item": item,
-        "files": grouped_files,
-        "image_type": config["convert"]["output_type"],
-    }
-    return template("files.html", parts)
+    if item:
+        files = [
+            (
+                os.path.basename(file),
+                os.path.join(
+                    os.path.basename(os.path.dirname(file)), os.path.basename(file)
+                ),
+            )
+            for file in glob.glob(f"downloads/{item.id}/*")
+        ]
+        grouped_files = {
+            "Analysis Report": [],
+            "KML": [],
+            "Zip": [],
+            "Image": [],
+            "Other": [],
+        }
+        for file in files:
+            if re.match(
+                r".+(\.txt|\.json|_curvature|_fresnel|_fresnel60|_profile|_reference)$",
+                file[0],
+            ):
+                grouped_files["Analysis Report"].append(file)
+            elif re.match(r".+\.(kml|kmz)$", file[0]):
+                grouped_files["KML"].append(file)
+            elif re.match(r".+\.(zip)$", file[0]):
+                grouped_files["Zip"].append(file)
+            elif re.match(r".+\.(png|jpg|bmp|ppm)$", file[0]):
+                grouped_files["Image"].append(file)
+            else:
+                grouped_files["Other"].append(file)
+        # print("File Count:", len(files))
+        if len(files) == 0:
+            redirect(f"/plot/{id}/generate")
+        parts = {
+            "type": "plot",
+            "item": item,
+            "files": grouped_files,
+            "image_type": config["convert"]["output_type"],
+        }
+        return template("files.html", parts)
+    else:
+        redirect(f"/")
 
 
 @get("/<item_type>/<id:int>/delete")  # Delete confirmation page

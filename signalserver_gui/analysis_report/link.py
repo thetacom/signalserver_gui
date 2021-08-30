@@ -163,13 +163,18 @@ class Link:
         """Getter for obstructions property."""
         return self._obstructions
 
+    @obstructions.setter
+    def obstructions(self, obstructions: List[Obstruction]) -> None:
+        """Setter for obstructions property."""
+        self._obstructions = obstructions
+
     def add_obstruction(self, new_item: Obstruction) -> None:
         """Add a new obstruction to the obstruction list."""
-        self._obstructions.append(new_item)
+        self.obstructions.append(new_item)
 
-    def add_obstruction_from_str(self, description: str) -> None:
+    def add_obstruction_from_str(self, descriptor: str) -> None:
         """Add a new obstruction to the obstruction list."""
-        self._obstructions.append(Obstruction.from_string(description))
+        self.obstructions.append(Obstruction.from_string(descriptor))
 
     @classmethod
     def from_file(cls, report_filename):
@@ -177,7 +182,7 @@ class Link:
 
         Link instance factory method.
         """
-        new_link = cls()
+        new_link = Link()
         try:
             in_target_section = False
             adjustment_lines = 0
@@ -186,6 +191,7 @@ class Link:
             else:
                 new_link.use_metric = True
             with open(report_filename) as report:
+                obstructions = []
                 for line in report:
                     if in_target_section:
                         if line.startswith("Free space path loss:"):
@@ -251,10 +257,12 @@ class Link:
                                 float(line.strip().split("at least ")[1].split(" ")[0])
                             )
                         elif line.startswith("    "):
-                            new_link.add_obstruction_from_str(line)
+                            obstructions.append(Obstruction.from_string(line))
+                            # new_link.add_obstruction_from_str(line)
                     else:
                         if line.startswith("Summary for the link between Tx and Rx:"):
                             in_target_section = True
+            new_link.obstructions = obstructions
             return new_link
         except Exception as e:
             raise (Exception(f"A problem occurred while parsing report file. {e}"))

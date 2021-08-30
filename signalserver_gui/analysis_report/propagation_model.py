@@ -180,7 +180,7 @@ class PropagationModel:
 
         PropagationModel instance factory method.
         """
-        new_model = cls()
+        new_model = PropagationModel()
         try:
             in_target_section = False
             with open(report_filename) as report:

@@ -231,7 +231,7 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
         command_args.extend(p2pa_args)
         results = run(command, command_args)
         make_analysis_plot(item, file_base, results, config["convert"]["output_type"])
-        report = parse_p2p_anaylsis(f"{file_base}.txt")
+        report = AnalysisReport.from_file(f"{file_base}.txt")
         with open(f"{file_base}.json", "w") as f:
             f.write(report.to_json())
         make_kmz(item, file_base, dimensions, config["convert"]["output_type"], report)
@@ -496,26 +496,23 @@ def make_analysis_plot(
     item: Plot, file_base: str, results: str, image_type="png"
 ) -> None:
     """Generate a P2P analysis graph image from signalserver analysis files."""
-    curvature = [
-        (float(line.split(" ")[0]), float(line.split(" ")[1]))
-        for line in open(file_base + "_curvature")
-    ]
-    fresnel = [
-        (float(line.split(" ")[0]), float(line.split(" ")[1]))
-        for line in open(file_base + "_fresnel")
-    ]
-    fresnel60 = [
-        (float(line.split(" ")[0]), float(line.split(" ")[1]))
-        for line in open(file_base + "_fresnel60")
-    ]
-    profile = [
-        (float(line.split(" ")[0]), float(line.split(" ")[1]))
-        for line in open(file_base + "_profile")
-    ]
-    reference = [
-        (float(line.split(" ")[0]), float(line.split(" ")[1]))
-        for line in open(file_base + "_reference")
-    ]
+    with open(file_base + "_curvature") as f:
+        curvature = [
+            (float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f
+        ]
+    with open(file_base + "_fresnel") as f:
+        fresnel = [(float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f]
+
+    with open(file_base + "_fresnel60") as f:
+        fresnel60 = [
+            (float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f
+        ]
+    with open(file_base + "_profile") as f:
+        profile = [(float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f]
+    with open(file_base + "_reference") as f:
+        reference = [
+            (float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f
+        ]
 
     reference_df = pd.DataFrame(reference, columns=["Distance", "Value"])
     profile_df = pd.DataFrame(profile, columns=["Distance", "Value"])
@@ -593,14 +590,3 @@ def make_analysis_plot(
     )
     fig.write_image(f"{file_base}_ppa.{image_type}")
     # fig.show()
-
-
-def parse_p2p_anaylsis(analysis_file):
-    """Parse raw signalserver analysis file(.txt) into an AnalysisReport object."""
-    base_filename, _ = os.path.splitext(analysis_file)
-    # curvature_file = base_filename + "_curvature"
-    # fresnel_file = base_filename + "_fresnel"
-    # fresnel60_file = base_filename + "_fresnel60"
-    # profile_file = base_filename + "_profile"
-    # reference_file = base_filename + "_reference"
-    return AnalysisReport.from_file(analysis_file)

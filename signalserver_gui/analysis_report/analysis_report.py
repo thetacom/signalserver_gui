@@ -48,7 +48,7 @@ class AnalysisReport:
         receiver = Site.from_file(report_filename, "rx")
         model = PropagationModel.from_file(report_filename)
         link = Link.from_file(report_filename)
-        return cls(transmitter, receiver, model, link)
+        return AnalysisReport(transmitter, receiver, model, link)
 
     def __str__(self):
         """Return a human readable string representation of a AnalysisReport instance."""

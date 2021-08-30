@@ -120,7 +120,7 @@ class Obstruction:
             )
             distance = float(parts[2].split(" ")[0])
             height = float(parts[3].split(" ")[0])
-            return cls(longitude, latitude, distance, height, metric)
+            return Obstruction(longitude, latitude, distance, height, metric)
         except Exception as e:
             raise (
                 Exception("Unable to parse obstruction descriptor. {e}\n{descriptor}")
