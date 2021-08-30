@@ -16,7 +16,10 @@ from sqlalchemy.orm import with_expression
 from sqlalchemy.sql.expression import desc
 
 from .analysis_report.analysis_report import AnalysisReport
-from .model import Antenna, Plot, Station, global_args, plot_args
+from .model import global_args, plot_args
+from .antenna import Antenna
+from .plot import Plot
+from .station import Station
 
 
 def which(program):

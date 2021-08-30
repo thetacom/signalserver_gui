@@ -22,6 +22,7 @@
 <div class="col-12">
 {%if action == "edit"%}
     {{macros.button("View", "primary", href="/"+type+"/"+item.id|string)}}
+    {{macros.button("Delete", "danger",href="/"+type+"/"+item.id|string+"/delete")}}
 {%endif%}
 </div>
 <form

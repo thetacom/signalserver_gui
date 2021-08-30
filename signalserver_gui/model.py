@@ -1,25 +1,8 @@
-"""Module contains declarative class definitions for database."""
-# TODO(Justin): Clean up unused imports.
-from datetime import datetime
+"""Module contains model and argument definitions."""
 import os
-from sqlalchemy import (
-    Boolean,
-    CheckConstraint,
-    Column,
-    DateTime,
-    Float,
-    ForeignKey,
-    Integer,
-    Sequence,
-    String,
-    Text,
-    create_engine,
-    event,
-    literal,
-)
-from sqlalchemy.orm import declarative_base, foreign, mapper, relationship, sessionmaker
-
-Base = declarative_base()
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import sessionmaker
+from .antenna import Antenna, Base
 
 
 def _fk_pragma_on_connect(dbapi_con, con_record):
@@ -27,212 +10,68 @@ def _fk_pragma_on_connect(dbapi_con, con_record):
     dbapi_con.execute("pragma foreign_keys=ON")
 
 
+def db_file_init(db_file: str):
+    if os.path.isfile(db_file):
+        os.remove(db_file)
+    engine = create_engine(f"sqlite:///{db_file}", echo=False)
+    event.listen(engine, "connect", _fk_pragma_on_connect)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    Base.metadata.create_all(engine)
+    load_antennas(db)
+    return db
+
+
 def init(db_path: str):
     """Initialize the sqlite database engine."""
     db_file = os.path.join(db_path, "signalserver_gui.db")
+    if not os.path.isfile(db_file):
+        db_file_init(db_file)
     engine = create_engine(f"sqlite:///{db_file}", echo=False)
     event.listen(engine, "connect", _fk_pragma_on_connect)
     return engine
 
 
-class Antenna(Base):
-    """Class representing an entry in the database's Antenna table."""
-
-    __tablename__ = "antennas"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(80), unique=True, nullable=False)
-    filename = Column(String(50), nullable=False)
-    type = Column(String(50), nullable=False)
-    rx_gain = Column(Float, default=0.0)
-    rx_threshhold = Column(Float, default=0.0)
-    created = Column(DateTime, default=datetime.now)
-    last_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
-    def __init__(self, name, filename, type, rx_gain=0.0, rx_threshhold=0.0):
-        """Initialize a new Antenna instance."""
-        self.name = name
-        self.filename = filename
-        self.rx_gain = rx_gain
-        self.rx_threshhold = rx_threshhold
-        self.type = type
-
-    def __repr__(self):
-        """Return a string representation of an Antena instance."""
-        if self.id:
-            return f"<Antenna({self.id:d}, '{self.name:s}')>"
-        else:
-            return f"<Antenna(New, '{self.name:s}')>"
-
-
-class Station(Base):
-    """Class representing an entry in the database's Station table."""
-
-    __tablename__ = "stations"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(80), unique=True, nullable=False)
-    latitude = Column(Float, default=0.00, nullable=False)
-    longitude = Column(Float, default=0.00, nullable=False)
-    height = Column(Float, default=1, nullable=False)
-    geography = Column(String(50), default="north america", nullable=False)
-    state = Column(String(50), default="n/a", nullable=False)
-    polarization = Column(String(10), default="vertical", nullable=False)
-    rotation = Column(Float, default=0.0, nullable=False)
-    downtilt = Column(Float, default=0.0, nullable=False)
-    downtilt_direction = Column(Float, default=0.0, nullable=False)
-    created = Column(DateTime, default=datetime.now)
-    last_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
-    def __init__(
-        self,
-        name,
-        latitude=0.0,
-        longitude=0.0,
-        height=30,
-        geography="North Americal",
-        state="N/A",
-        polarization="vertical",
-        rotation=0.0,
-        downtilt=0.0,
-        downtilt_direction=0.0,
-    ):
-        """Initialize a new Station instance."""
-        self.name = name
-        self.latitude = latitude
-        self.longitude = longitude
-        self.height = height
-        self.geography = geography
-        self.state = state
-        self.polarization = polarization
-        self.rotation = rotation
-        self.downtilt = downtilt
-        self.downtilt_direction = downtilt_direction
-
-    def __repr__(self):
-        """Return a string representation of a Station instance."""
-        if self.id:
-            return f"<Station('{self.id:d}', '{self.name:s}')>"
-        else:
-            return f"<Station(New, '{self.name:s}')>"
-
-
-class Plot(Base):
-    """Class representing an entry in the database's Plot table."""
-
-    __tablename__ = "plots"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(80), unique=True, nullable=False)
-    do_p2p_analysis = Column(Boolean, default=False, nullable=False)
-    use_metric_units = Column(Boolean, default=False, nullable=False)
-    use_lidar = Column(Boolean, default=False, nullable=False)
-    use_udt = Column(Boolean, default=False, nullable=False)
-    use_dbm = Column(Boolean, default=False, nullable=False)
-    use_knife_edge_diffraction = Column(Boolean, default=False, nullable=False)
-    frequency = Column(Float, nullable=False)
-    opacity = Column(Float, default=1.0, nullable=False)
-    effective_radiated_power = Column(Float, default=0.0, nullable=False)
-    ground_clutter = Column(Float)
-    resample_reduction_factor = Column(Integer)
-    terrain_code = Column(Integer)
-    terrain_dialectric = Column(Float)
-    terrain_conductivity = Column(Float)
-    climate_code = Column(Integer)
-    itm_reliability = Column(Integer)
-    itm_confidence = Column(Integer)
-    radius = Column(Integer, default=25, nullable=False)
-    resolution = Column(Integer, default=600, nullable=False)
-    propagation_model = Column(Integer)
-    propagation_mode = Column(Integer)
-    antenna_id = Column(Integer, ForeignKey("antennas.id"), nullable=False)
-    station1_id = Column(Integer, ForeignKey("stations.id"), nullable=False)
-    station2_id = Column(
-        Integer,
-        ForeignKey("stations.id"),
-        CheckConstraint("station1_id != station2_id"),
-        nullable=True,
-    )
-    antenna = relationship("Antenna", foreign_keys=[antenna_id])
-    station1 = relationship("Station", foreign_keys=[station1_id])
-    station2 = relationship("Station", foreign_keys=[station2_id])
-    created = Column(DateTime, default=datetime.now)
-    last_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
-    def __init__(
-        self,
-        name,
-        frequency,
-        antenna_id,
-        station1_id,
-        station2_id=None,
-        do_p2p_analysis=False,
-        use_metric_units=False,
-        use_lidar=False,
-        use_udt=False,
-        use_dbm=False,
-        use_knife_edge_diffraction=False,
-        opacity=1.0,
-        effective_radiated_power=0.0,
-        radius=25,
-        propagation_model=None,
-        propagation_mode=None,
-        terrain_code=None,
-        terrain_dialectric=None,
-        terrain_conductivity=None,
-        climate_code=None,
-        itm_reliability=None,
-        itm_confidence=None,
-        resolution=None,
-        ground_clutter=None,
-        resample_reduction_factor=None,
-    ):
-        """Initialize a new Plot instance."""
-        self.name = name
-        self.do_p2p_analysis = do_p2p_analysis
-        self.use_metric_units = use_metric_units
-        self.use_lidar = use_lidar
-        self.use_udt = use_udt
-        self.use_dbm = use_dbm
-        self.use_knife_edge_diffraction = use_knife_edge_diffraction
-        self.opacity = opacity
-        self.effective_radiated_power = effective_radiated_power
-        self.frequency = frequency
-        self.radius = radius
-        self.resolution = resolution
-        self.propagation_model = propagation_model
-        self.propagation_mode = propagation_mode
-        self.terrain_code = terrain_code
-        self.terrain_dialectric = terrain_dialectric
-        self.terrain_conductivity = terrain_conductivity
-        self.climate_code = climate_code
-        self.itm_reliability = itm_reliability
-        self.itm_confidence = itm_confidence
-        self.ground_clutter = ground_clutter
-        self.resample_reduction_factor = resample_reduction_factor
-        self.antenna_id = antenna_id
-        self.station1_id = station1_id
-        self.station2_id = station2_id
-
-    def __repr__(self):
-        """Return a string representation of a Plot instance."""
-        if self.id:
-            return f"<Plot('{self.id:d}', '{self.name:s}')>"
-        else:
-            return f"<Plot(New, '{self.name:s}')>"
-
-    def rf_units(self):
-        """Return appropriate RF units depending on plot configuration."""
-        # TODO(Justin): Refactor unit handling into separate module.
-        if self.use_dbm:
-            return "dBm"
-        else:
-            return "dBuV/m"
-
-    def distance_units(self):
-        """Return appropriate distance units depending on plot configuration."""
-        # TODO(Justin): Refactor unit handling into separate module.
-        if self.use_metric_units:
-            return "m"
-        else:
-            return "ft"
+def load_antennas(db):
+    """Populate database with generic antennas."""
+    generic_antennas = [
+        {
+            "type": "antenna",
+            "columns": {
+                "name": "Generic Dipole",
+                "type": "dipole",
+                "filename": "dipole",
+            },
+        },
+        {
+            "type": "antenna",
+            "columns": {"name": "DB413-B", "type": "dipole", "filename": "DB413-B"},
+        },
+        {
+            "type": "antenna",
+            "columns": {"name": "Generic Yagi", "type": "yagi", "filename": "yagi"},
+        },
+        {
+            "type": "antenna",
+            "columns": {
+                "name": "Generic Cardio",
+                "type": "cardio",
+                "filename": "cardio",
+            },
+        },
+        {
+            "type": "antenna",
+            "columns": {
+                "name": "Generic Ellipse",
+                "type": "ellipse",
+                "filename": "ellipse",
+            },
+        },
+    ]
+    for item in generic_antennas:
+        new_row = Antenna(**item["columns"])
+        db.add(new_row)
+    db.commit()
 
 
 # Map all global parameters to their various attributes.
