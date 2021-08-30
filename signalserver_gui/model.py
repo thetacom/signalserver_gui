@@ -72,11 +72,11 @@ class Station(Base):
     __tablename__ = "stations"
     id = Column(Integer, primary_key=True)
     name = Column(String(80), unique=True, nullable=False)
-    latitude = Column(Float, default=0.0, nullable=False)
-    longitude = Column(Float, default=0.0, nullable=False)
-    height = Column(Float, default=30, nullable=False)
-    geography = Column(String(50), default="North America", nullable=False)
-    state = Column(String(50), default="N/A", nullable=False)
+    latitude = Column(Float, default=0.00, nullable=False)
+    longitude = Column(Float, default=0.00, nullable=False)
+    height = Column(Float, default=1, nullable=False)
+    geography = Column(String(50), default="north america", nullable=False)
+    state = Column(String(50), default="n/a", nullable=False)
     polarization = Column(String(10), default="vertical", nullable=False)
     rotation = Column(Float, default=0.0, nullable=False)
     downtilt = Column(Float, default=0.0, nullable=False)
@@ -707,7 +707,13 @@ plot_args = {
             "hint": "Rx gain dBd (optional for PPA text report)",
             "form": {
                 "type": "range",
-                "parameters": {"min": 0, "max": 120, "step": 3, "units": "dB"},
+                "parameters": {
+                    "min": 0,
+                    "max": 120,
+                    "step": 3,
+                    "default": 0,
+                    "units": "dB",
+                },
             },
         },
         "rx_threshhold": {
@@ -716,7 +722,13 @@ plot_args = {
             "hint": "Rx Threshold (dB / dBm / dBuV/m)",
             "form": {
                 "type": "range",
-                "parameters": {"min": -120, "max": 0, "step": 3, "units": "dBm"},
+                "parameters": {
+                    "min": -120,
+                    "max": 0,
+                    "step": 3,
+                    "default": 0,
+                    "units": "dBm",
+                },
             },
         },
         "filename": {
@@ -763,8 +775,19 @@ plot_args = {
             "hint": "The country the station physically resides in if outside the United States.",
             "form": {
                 "type": "select",
-                "parameters": {"options": ["united states", "canada", "mexico"]},
-                "default": "united states",
+                "parameters": {
+                    "options": [
+                        "north america",
+                        "central america",
+                        "south america",
+                        "europe",
+                        "africa",
+                        "asia",
+                        "caribbean",
+                        "oceania",
+                    ]
+                },
+                "default": "north america",
             },
         },
         "state": {
@@ -784,7 +807,7 @@ plot_args = {
             "hint": "Station latitude (decimal degrees) -70/+70",
             "form": {
                 "type": "range",
-                "parameters": {"min": -70, "max": 70, "step": 0.01},
+                "parameters": {"min": -70, "max": 70, "step": 0.01, "default": 0.00},
             },
         },
         "longitude": {
@@ -793,7 +816,7 @@ plot_args = {
             "hint": "Station longitude (decimal degrees) -180/+180",
             "form": {
                 "type": "range",
-                "parameters": {"min": -180, "max": 180, "step": 0.01},
+                "parameters": {"min": -180, "max": 180, "step": 0.01, "default": 0.00},
             },
         },
         "height": {
@@ -802,7 +825,11 @@ plot_args = {
             "hint": "Tx Height (above ground)",
             "form": {
                 "type": "text",
-                "parameters": {"placeholder": "0", "required": True, "default": 1},
+                "parameters": {
+                    "placeholder": "Height AGL",
+                    "required": True,
+                    "default": 1,
+                },
             },
         },
         "polarization": {
@@ -811,7 +838,10 @@ plot_args = {
             "hint": "Horizontal Polarisation (default=vertical)",
             "form": {
                 "type": "select",
-                "parameters": {"options": ["horizontal", "vertical"]},
+                "parameters": {
+                    "options": ["horizontal", "vertical"],
+                    "default": "vertical",
+                },
             },
         },
         "rotation": {
@@ -820,7 +850,7 @@ plot_args = {
             "hint": "(  0.0 - 359.0 degrees, default 0.0) Antenna Pattern Rotation",
             "form": {
                 "type": "range",
-                "parameters": {"min": 0, "max": 359, "step": 0.1},
+                "parameters": {"min": 0, "max": 359, "step": 0.1, "default": 0.0},
             },
         },
         "downtilt": {
@@ -829,7 +859,7 @@ plot_args = {
             "hint": "( -10.0 - 90.0 degrees, default 0.0) Antenna Downtilt",
             "form": {
                 "type": "range",
-                "parameters": {"min": -10, "max": 90, "step": 0.1},
+                "parameters": {"min": -10, "max": 90, "step": 0.1, "default": 0.0},
             },
         },
         "downtilt_direction": {
@@ -838,35 +868,26 @@ plot_args = {
             "hint": "( 0.0 - 359.0 degrees, default 0.0) Antenna Downtilt Direction",
             "form": {
                 "type": "range",
-                "parameters": {"min": 0, "max": 359, "step": 0.1},
+                "parameters": {"min": 0, "max": 359, "step": 0.1, "default": 0.0},
             },
         },
         "rx_height": {
             "flag": "-rxh",
             "depends": ["do_p2p_analysis"],
-            "hint": "Rx height above ground (optional. Default=0.1)",
-            "form": {
-                "type": "text",
-                "parameters": {"placeholder": "0", "required": True},
-            },
+            "hint": "Rx height above ground (optional. Default=1)",
+            "form": {"type": "ignore"},
         },
         "rx_latitude": {
             "flag": "-rla",
             "depends": ["do_p2p_analysis"],
             "hint": "Rx Latitude for PPA (decimal degrees) -70/+70",
-            "form": {
-                "type": "range",
-                "parameters": {"min": -70, "max": 70, "step": 0.01},
-            },
+            "form": {"type": "ignore"},
         },
         "rx_longitude": {
             "flag": "-rlo",
             "depends": ["do_p2p_analysis"],
             "hint": "Rx Longitude for PPA (decimal degrees) -180/+180",
-            "form": {
-                "type": "range",
-                "parameters": {"min": -180, "max": 180, "step": 0.01},
-            },
+            "form": {"type": "ignore"},
         },
     },
 }

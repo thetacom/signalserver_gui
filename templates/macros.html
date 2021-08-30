@@ -253,6 +253,7 @@ step=0.5, default = 0, units="", required=False)%}
   <label for="form-{{name}}-range" class="form-label"
     >{{" ".join((name|string).split("_")).title()}}</label
   >
+  <!--Range Debugging - Value:{{value}} Default:{{default}}-->
   <input
     id="form-{{name}}-range"
     name="{{name}}"
@@ -263,7 +264,6 @@ step=0.5, default = 0, units="", required=False)%}
     step="{{step}}"
     {%if
     value
-    != None
     %}
     value="{{value}}"
     {%else%}
