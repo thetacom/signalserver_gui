@@ -276,6 +276,7 @@ def delete_item(item_type, id, db):
                 item_type == "station"
                 and db.query(Plot).filter_by(station2_id=id).count() == 0
             )
+            or item_type == "plot"
         ):
             try:
                 antenna_type = dirty_item.type if item_type == "antenna" else ""
@@ -357,7 +358,38 @@ def action_item(item_type, action, db, id=0):
     parts["item"] = item
 
     if request.method == "POST":
-        if action == "new":
+        if item_type == "plot" and len(request.forms.get("name")) < 8:
+            messages.append(
+                {
+                    "message": "Name must be 8 characters or longer.",
+                    "title": f"Item creation failed.",
+                    "type": "danger",
+                }
+            )
+        elif (
+            item_type == "plot"
+            and request.forms.get("do_p2p_analysis")
+            and request.forms.get("station2_id") == ""
+        ):
+            messages.append(
+                {
+                    "message": "Propagation analysis requires both Station 1 and Station 2 to be set.",
+                    "title": f"Item creation failed.",
+                    "type": "danger",
+                }
+            )
+        elif (
+            item_type == "plot"
+            and request.forms.get("station1_id") == request.forms.get("station2_id")
+        ):
+            messages.append(
+                {
+                    "message": "Station 1 and Station 2 must be different.",
+                    "title": f"Item creation failed.",
+                    "type": "danger",
+                }
+            )
+        elif action == "new":
             try:
                 antenna_file = request.files.get("filename")
                 if antenna_file:
@@ -391,10 +423,12 @@ def action_item(item_type, action, db, id=0):
                         else:
                             params[col.name] = value
                 new_item = item_class(**params)
+
                 db.add(new_item)
                 db.commit()
 
             except Exception as e:
+                db.rollback()
                 messages.append(
                     {"message": e, "title": f"Item creation failed.", "type": "danger"}
                 )
@@ -407,6 +441,15 @@ def action_item(item_type, action, db, id=0):
                 dirty_item = db.get(item_class, id)
                 for col in item_class.__table__.columns:
                     value = request.forms.get(col.name)
+                    if item_type == "plot" and col.name == "name" and len(value) < 8:
+                        messages.append(
+                            {
+                                "message": "Name must be 8 characters or longer.",
+                                "title": f"Item update failed.",
+                                "type": "danger",
+                            }
+                        )
+                        break
                     if isinstance(col.type, Boolean):
                         if value != None:
                             setattr(dirty_item, col.name, True)
@@ -422,6 +465,7 @@ def action_item(item_type, action, db, id=0):
                 # db.query(item_class).filter_by(id=id).update(request.forms)
                 db.commit()
             except Exception as e:
+                db.rollback()
                 messages.append(
                     {"message": e, "title": f"Item update failed.", "type": "danger"}
                 )

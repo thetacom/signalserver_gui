@@ -4,6 +4,7 @@ import base64
 import configparser
 import glob
 import os
+from shlex import quote
 import subprocess
 from zipfile import ZipFile
 
@@ -197,7 +198,7 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
         os.makedirs(item_path)
     except:
         pass
-    file_base = os.path.join(item_path, item.name)
+    file_base = quote(os.path.join(item_path, item.name))
     command_args.extend(["-o", file_base])
 
     # Use 'signalserverHD' if resolution is set to 3600.

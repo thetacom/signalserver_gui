@@ -22,7 +22,12 @@ class Plot(Base):
 
     __tablename__ = "plots"
     id = Column(Integer, primary_key=True)
-    name = Column(String(80), unique=True, nullable=False)
+    name = Column(
+        String(80),
+        CheckConstraint("length(name) > 7"),
+        unique=True,
+        nullable=False,
+    )
     do_p2p_analysis = Column(Boolean, default=False, nullable=False)
     use_metric_units = Column(Boolean, default=False, nullable=False)
     use_lidar = Column(Boolean, default=False, nullable=False)

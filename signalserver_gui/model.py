@@ -122,7 +122,7 @@ plot_args = {
         "name": {
             "flag": None,
             "depends": None,
-            "hint": "Must be unique and at least 11 characters long.",
+            "hint": "Must be unique and at least 8 characters long.",
             "form": {
                 "type": "text",
                 "parameters": {"placeholder": "Plot Name", "required": True},
