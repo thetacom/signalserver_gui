@@ -366,6 +366,14 @@ def action_item(item_type, action, db, id=0):
                     "type": "danger",
                 }
             )
+        elif item_type == "plot" and " " in request.forms.get("name"):
+            messages.append(
+                {
+                    "message": "Plot names cannot contain spaces.",
+                    "title": f"Item creation failed.",
+                    "type": "danger",
+                }
+            )
         elif (
             item_type == "plot"
             and request.forms.get("do_p2p_analysis")
@@ -378,10 +386,9 @@ def action_item(item_type, action, db, id=0):
                     "type": "danger",
                 }
             )
-        elif (
-            item_type == "plot"
-            and request.forms.get("station1_id") == request.forms.get("station2_id")
-        ):
+        elif item_type == "plot" and request.forms.get(
+            "station1_id"
+        ) == request.forms.get("station2_id"):
             messages.append(
                 {
                     "message": "Station 1 and Station 2 must be different.",

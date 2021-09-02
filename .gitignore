@@ -5,7 +5,7 @@
 .mypy_cache
 __pycache__
 tmp/*
-db/*
+db/*.db
 elevation_data/*
 downloads/*
 
