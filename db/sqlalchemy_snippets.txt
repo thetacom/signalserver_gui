@@ -1,0 +1,7 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import model
+engine = create_engine("sqlite:///db/signalserver-gui.db", echo=True)
+Session = sessionmaker(bind=engine)
+db = Session()
+model.Antenna(name="yagi", type="yagi", filename="test")
