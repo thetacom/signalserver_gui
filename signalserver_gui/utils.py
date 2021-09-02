@@ -198,7 +198,7 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
         os.makedirs(item_path)
     except:
         pass
-    file_base = quote(os.path.join(item_path, item.name))
+    file_base = os.path.join(item_path, item.name)
     command_args.extend(["-o", file_base])
 
     # Use 'signalserverHD' if resolution is set to 3600.
@@ -232,14 +232,14 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
         command_args.extend(p2pa_args)
         results = run(command, command_args)
         make_analysis_plot(item, file_base, results, config["convert"]["output_type"])
-        report = AnalysisReport.from_file(f"{file_base}.txt")
+        report = AnalysisReport.from_file(quote(f"{file_base}.txt"))
         with open(f"{file_base}.json", "w") as f:
             f.write(report.to_json())
         make_kmz(item, file_base, dimensions, config["convert"]["output_type"], report)
     else:
         make_kmz(item, file_base, dimensions, config["convert"]["output_type"])
 
-    with ZipFile(f"{file_base}.zip", "w") as zip:
+    with ZipFile(quote(f"{file_base}.zip"), "w") as zip:
         for filename in glob.glob(f"{item_path}/*"):
             if "zip" not in filename:
                 zip.write(filename, os.path.basename(filename))
@@ -366,12 +366,12 @@ def make_kmz(
 ]]>"""
         # Build description text of analysis.
         # TODO(Justin): Create better description using new AnalysisReport class.
-        with open(file_base + ".txt") as analysis:
+        with open(quote(f"{file_base}.txt")) as analysis:
             description += "<p><ul>"
             for line in analysis:
                 description += f"<li>{line}</li>"
             description += f"</ul></p><p>Azimuth: {azimuth:0.2f}</p>"
-        kml.addfile(f"{file_base}_ppa.{image_type}")
+        kml.addfile(quote(f"{file_base}_ppa.{image_type}"))
         # Add analyasis items to station1.
         station1.description = description
         station1.lookat.heading = azimuth + 10
@@ -464,7 +464,7 @@ def make_kmz(
                     report.receiver.metric_height,
                 ),
             ]
-    kml.savekmz(f"{file_base}.kmz")
+    kml.savekmz(quote(f"{file_base}.kmz"))
 
 
 def db_to_norm(db: float) -> float:
@@ -497,18 +497,18 @@ def make_analysis_plot(
     item: Plot, file_base: str, results: str, image_type="png"
 ) -> None:
     """Generate a P2P analysis graph image from signalserver analysis files."""
-    with open(file_base + "_curvature") as f:
+    with open(quote(f"{file_base}_curvature")) as f:
         curvature = [
             (float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f
         ]
-    with open(file_base + "_fresnel") as f:
+    with open(quote(f"{file_base}_fresnel")) as f:
         fresnel = [(float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f]
 
-    with open(file_base + "_fresnel60") as f:
+    with open(quote(f"{file_base}_fresnel60")) as f:
         fresnel60 = [
             (float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f
         ]
-    with open(file_base + "_profile") as f:
+    with open(quote(f"{file_base}_profile")) as f:
         profile = [(float(line.split(" ")[0]), float(line.split(" ")[1])) for line in f]
     with open(file_base + "_reference") as f:
         reference = [
