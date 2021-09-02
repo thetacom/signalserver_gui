@@ -199,7 +199,7 @@ def generate(config: configparser.ConfigParser, item: Plot) -> str:
     except:
         pass
     file_base = os.path.join(item_path, item.name)
-    command_args.extend(["-o", file_base])
+    command_args.extend(["-o", quote(file_base)])
 
     # Use 'signalserverHD' if resolution is set to 3600.
     if item.resolution == 3600:
