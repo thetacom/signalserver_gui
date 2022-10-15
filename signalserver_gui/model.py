@@ -594,7 +594,13 @@ plot_args = {
             "form": {
                 "type": "select",
                 "parameters": {
-                    "options": ["n/a", "alabama", "alaska", "arizona", "arkansas"]
+                    "options": [
+                        "n/a",
+                        "alabama",
+                        "alaska",
+                        "arizona",
+                        "arkansas",
+                    ]
                 },
             },
         },
@@ -604,7 +610,12 @@ plot_args = {
             "hint": "Station latitude (decimal degrees) -70/+70",
             "form": {
                 "type": "range",
-                "parameters": {"min": -70, "max": 70, "step": 0.01, "default": 0.00},
+                "parameters": {
+                    "min": -70,
+                    "max": 70,
+                    "step": 0.001,
+                    "default": 0.00,
+                },
             },
         },
         "longitude": {
@@ -613,7 +624,12 @@ plot_args = {
             "hint": "Station longitude (decimal degrees) -180/+180",
             "form": {
                 "type": "range",
-                "parameters": {"min": -180, "max": 180, "step": 0.01, "default": 0.00},
+                "parameters": {
+                    "min": -180,
+                    "max": 180,
+                    "step": 0.001,
+                    "default": 0.00,
+                },
             },
         },
         "height": {
@@ -647,7 +663,12 @@ plot_args = {
             "hint": "(  0.0 - 359.0 degrees, default 0.0) Antenna Pattern Rotation",
             "form": {
                 "type": "range",
-                "parameters": {"min": 0, "max": 359, "step": 0.1, "default": 0.0},
+                "parameters": {
+                    "min": 0,
+                    "max": 359,
+                    "step": 0.1,
+                    "default": 0.0,
+                },
             },
         },
         "downtilt": {
@@ -656,7 +677,12 @@ plot_args = {
             "hint": "( -10.0 - 90.0 degrees, default 0.0) Antenna Downtilt",
             "form": {
                 "type": "range",
-                "parameters": {"min": -10, "max": 90, "step": 0.1, "default": 0.0},
+                "parameters": {
+                    "min": -10,
+                    "max": 90,
+                    "step": 0.1,
+                    "default": 0.0,
+                },
             },
         },
         "downtilt_direction": {
@@ -665,7 +691,12 @@ plot_args = {
             "hint": "( 0.0 - 359.0 degrees, default 0.0) Antenna Downtilt Direction",
             "form": {
                 "type": "range",
-                "parameters": {"min": 0, "max": 359, "step": 0.1, "default": 0.0},
+                "parameters": {
+                    "min": 0,
+                    "max": 359,
+                    "step": 0.1,
+                    "default": 0.0,
+                },
             },
         },
         "rx_height": {
